@@ -9,11 +9,8 @@
 import UIKit
 import GameKit
 
-class GameViewController: UIViewController, ADBannerViewDelegate, UIAlertViewDelegate {
-    
-    @IBOutlet weak var adBanner: ADBannerView!
-    var shouldShowAds: Bool = true
-    
+class GameViewController: UIViewController, UIAlertViewDelegate {
+        
     //outlets
     @IBOutlet weak var hintButton: UIButton!
     @IBOutlet weak var FiftyFiftyButton: UIButton!

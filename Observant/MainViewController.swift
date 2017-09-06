@@ -23,54 +23,6 @@ class MainViewController: UIViewController, ADBannerViewDelegate, GKGameCenterCo
         authenticateLocalPlayer()
     }
     
-    func authenticateLocalPlayer()
-    {
-        let localPlayer = GKLocalPlayer()
-        
-        localPlayer.authenticateHandler = {(viewController: UIViewController?, error: NSError?) in
-            
-            if (viewController != nil)
-            {
-                self.present(viewController!, animated: true, completion: nil)
-            }
-            else
-            {
-                if (GKLocalPlayer.localPlayer().isAuthenticated)
-                {
-                    self.gameCenterEnabled = true
-                    
-                    GKLocalPlayer.localPlayer().loadDefaultLeaderboardIdentifier(completionHandler: { (leaderboardIdentifier:String?, error:NSError?) -> Void in
-                        
-                        if (error != nil)
-                        {
-                            print(error?.localizedDescription)
-                        }
-                        else
-                        {
-                            self.leaderBoardIdentifier = leaderboardIdentifier!
-                        }
-                        
-                        } as! (String?, Error?) -> Void)
-                    
-                }
-                else
-                {
-                    self.gameCenterEnabled = false
-                }
-            }
-            
-        } as! (UIViewController?, Error?) -> Void
-    }
-    @IBAction func restorePurchases(_ sender: AnyObject)
-    {
-        PFPurchase.restore()
-        
-        let alert = UIAlertView(title: "Restored", message: "Your purchases have been restored. If you are experiencing issues or you have questions, please contact the developer.", delegate: self, cancelButtonTitle: "Ok")
-        
-        alert.show()
-        
-    }
-    
     @IBAction func twitter(_ sender: AnyObject)
     {
         let twitterURL = URL(string: "twitter://user?screen_name=NCUnitedApps")
@@ -83,26 +35,37 @@ class MainViewController: UIViewController, ADBannerViewDelegate, GKGameCenterCo
         {
             UIApplication.shared.openURL(URL(fileURLWithPath: "www.twitter.com/NCUnitedApps"))
         }
-        
     }
     
-    func showLeaderboard(_ identifier: NSString)
+    func authenticateLocalPlayer()
+    {
+        let localPlayer = GKLocalPlayer.localPlayer()
+        
+        localPlayer.authenticateHandler = {(viewController: UIViewController?, error: Error?) in
+            
+            if let VC = viewController { self.present(VC, animated: true, completion: nil) }
+            else
+            {
+                guard localPlayer.isAuthenticated else { return }
+                
+                localPlayer.loadDefaultLeaderboardIdentifier(completionHandler:nil)
+            }
+        }
+    }
+    
+    func showLeaderboard(withIdentifier identifier: String)
     {
         let GKVC = GKGameCenterViewController()
-        
         GKVC.gameCenterDelegate = self
-        
         GKVC.viewState = GKGameCenterViewControllerState.leaderboards
-            
-        GKVC.leaderboardIdentifier = identifier as String
+        GKVC.leaderboardIdentifier = identifier
         
         present(GKVC, animated: true, completion: nil)
-        
     }
 
     @IBAction func leaderboard(_ sender: AnyObject) {
         
-        showLeaderboard("highScoreEasy")
+        showLeaderboard(withIdentifier: "highScoreEasy")
         
     }
     
@@ -112,25 +75,6 @@ class MainViewController: UIViewController, ADBannerViewDelegate, GKGameCenterCo
         
     }
     
-    @IBAction func freeHInt(_ sender: AnyObject) {
-        
-        if (AdColony.isVirtualCurrencyRewardAvailable(forZone: "vz5f919c3261564e74a9"))
-        {
-            print("yes")
-            AdColony.playVideoAd(forZone: "vz5f919c3261564e74a9", with: nil, withV4VCPrePopup: true, andV4VCPostPopup: true)
-            
-        }
-        else
-        {
-            print("no")
-            let alert = UIAlertView(title: "Sorry", message: "Ad currently unavailable.", delegate: self, cancelButtonTitle: "Ok")
-            
-            alert.show()
-        }
-
-        
-        
-    }
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -145,13 +89,7 @@ class MainViewController: UIViewController, ADBannerViewDelegate, GKGameCenterCo
             GVC.numberOfButtons = 9
             GVC.numberOfRows = 3
             GVC.numberOfColumns = 3
-      
-
         }
-        
-        
-        
     }
     
-
 }
