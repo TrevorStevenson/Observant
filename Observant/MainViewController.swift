@@ -9,7 +9,7 @@
 import UIKit
 import GameKit
 
-class MainViewController: UIViewController, ADBannerViewDelegate, GKGameCenterControllerDelegate, UIAlertViewDelegate {
+class MainViewController: UIViewController, GKGameCenterControllerDelegate, UIAlertViewDelegate {
     
     var gameCenterEnabled: Bool = false
     var leaderBoardIdentifier: String = ""

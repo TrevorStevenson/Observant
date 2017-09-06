@@ -54,17 +54,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
     
-    override func viewWillAppear(_ animated: Bool) {
-        
-        if (UserDefaults.standard.bool(forKey: "showAds") == false)
-        {
-            shouldShowAds = false
-            
-            adBanner.removeFromSuperview()
-        }
-        
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -104,84 +93,26 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
 
     }
     
-    func bannerViewDidLoadAd(_ banner: ADBannerView!) {
-        
-        if (shouldShowAds == true)
-        {
-        
-            UIView.beginAnimations(nil, context: nil)
-        
-            UIView.setAnimationDuration(1.0)
-        
-            banner.alpha = 1.0
-        
-            UIView.commitAnimations()
-            
-        }
-        else
-        {
-            UIView.beginAnimations(nil, context: nil)
-            
-            UIView.setAnimationDuration(1.0)
-            
-            banner.alpha = 0.0
-            
-            UIView.commitAnimations()
-        }
-        
-    }
-    
-    func bannerView(_ banner: ADBannerView!, didFailToReceiveAdWithError error: Error!) {
-        
-        if (shouldShowAds == true)
-        {
-        
-            UIView.beginAnimations(nil, context: nil)
-        
-            UIView.setAnimationDuration(1.0)
-            
-            banner.alpha = 0.0
-        
-            UIView.commitAnimations()
-            
-        }
-        else
-        {
-            UIView.beginAnimations(nil, context: nil)
-            
-            UIView.setAnimationDuration(1.0)
-            
-            banner.alpha = 0.0
-            
-            UIView.commitAnimations()
-        }
-    }
-
     
     func newLevel()
     {
         levelHasLayedOutSubviews = false
         
-        hintButton.isUserInteractionEnabled = false
         FiftyFiftyButton.isUserInteractionEnabled = false
         
         //creates pop up box which fades in and out
-        presentMessage(200, height: 50, x: self.view.center.x - 100, y: self.view.center.y - 25, bgColor: UIColor.black, message: "Level " + String(level), textColor: UIColor.white, fontSize: 30)
+        presentMessage(200, height: 50, x: self.view.center.x - 100, y: self.view.center.y - 25, bgColor: UIColor.black, message: "Level \(level)" as NSString, textColor: UIColor.white, fontSize: 30)
         
         timerValue = 10
         timeTaken = 21
         
         timerLabel.text = String(timerValue)
         
-        
-        
         updateScore()
-        
     }
     
     func presentMessage(_ width: CGFloat, height: CGFloat, x: CGFloat, y: CGFloat, bgColor: UIColor, message: NSString, textColor: UIColor, fontSize: CGFloat)
     {
-        
         let box = UIView(frame: CGRect(x: x, y: y, width: width, height: height))
         
         box.backgroundColor = bgColor
@@ -192,7 +123,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         let label = UILabel(frame: box.frame)
         
         label.text = message as String
-        label.font = UIFont(name: "Menlo-Bold", size: fontSize)
+        label.font = UIFont(name: "Avenir-Book", size: fontSize)
         label.textColor = textColor
         label.textAlignment = .center
         label.alpha = 0.0
@@ -222,7 +153,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             self.levelHasLayedOutSubviews = true
             
             }})
-    
     }
     
     func layoutButtons()
@@ -256,10 +186,8 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         
         for i: Int in 1...numberOfRows
         {
-            
             for ink in 1...buttonsPerRow
             {
-                
                 let button = UIButton(frame: CGRect(x: xPos, y: yPos, width: (width / CGFloat(numberOfColumns)) - 2.5, height: (height / CGFloat(numberOfRows)) - 2.5))
                 
                 button.backgroundColor = UIColor.white
@@ -270,7 +198,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
                 
                 let randNum: Int = Int(arc4random_uniform(11))
                 
-                button.titleLabel?.font = UIFont(name: "Menlo-Bold", size: 17)
+                button.titleLabel?.font = UIFont(name: "Avenir-Book", size: 17)
                 button.setTitle(String(randNum), for: UIControlState())
                 button.setTitleColor(UIColor.black, for: UIControlState())
                 button.addTarget(self, action: #selector(GameViewController.chooseNumber(_:)), for: UIControlEvents.touchUpInside)
@@ -278,7 +206,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
                 
                 buttonsArray.append(button)
             
-                self.view.insertSubview(button, belowSubview: adBanner)
+                self.view.insertSubview(button, belowSubview: highScoreLabel)
                 
                 if (ink < buttonsPerRow)
                 {
@@ -318,7 +246,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             timer.invalidate()
             timerRunning = false
             
-            var delay = Timer.scheduledTimer(timeInterval: 1.5, target: self, selector: #selector(GameViewController.makeChange), userInfo: nil, repeats: false)
+            _ = Timer.scheduledTimer(timeInterval: 1.5, target: self, selector: #selector(GameViewController.makeChange), userInfo: nil, repeats: false)
             
             callCurtain()
 
@@ -359,7 +287,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         
         curtain.backgroundColor = UIColor.black
         
-        self.view.insertSubview(curtain, belowSubview: adBanner)
+        self.view.insertSubview(curtain, belowSubview: highScoreLabel)
         
         UIView.animate(withDuration: 3, delay: 0, options: UIViewAnimationOptions.curveLinear, animations: {
             
@@ -401,7 +329,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             
             level += 1
             
-            var nextLevelTimer = Timer.scheduledTimer(timeInterval: 2.1, target: self, selector: #selector(GameViewController.newLevel), userInfo: nil, repeats: false)
+            _ = Timer.scheduledTimer(timeInterval: 2.1, target: self, selector: #selector(GameViewController.newLevel), userInfo: nil, repeats: false)
             
             
         }
@@ -411,7 +339,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             
             submitScore()
             
-            var quitTimer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(GameViewController.quitGame), userInfo: nil, repeats: false)
+            _ = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(GameViewController.quitGame), userInfo: nil, repeats: false)
             
         }
         
@@ -559,13 +487,14 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         
         highScore.value = Int64(score)
         
-        GKScore.report([highScore], withCompletionHandler: { (error:NSError?) -> Void in
+        GKScore.report([highScore], withCompletionHandler: { (error: Error?) -> Void in
             
-            if (error != nil)
+            if let err = error
             {
-                print(error?.localizedDescription)
+                print(err.localizedDescription)
             }
-        } as! (Error?) -> Void)
+            
+        })
         
         UserDefaults.standard.set(score, forKey: "highScore")
         
