@@ -19,38 +19,37 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
     @IBOutlet weak var highScoreLabel: UILabel!
     @IBOutlet weak var fiftyLabel: UILabel!
     
-    
-    //stores what level it is
+    // stores what level it is
     var level: Int = 1
     
-    //layout variables
+    // layout variables
     var numberOfButtons: Int = 0
     var numberOfRows: Int = 0
     var numberOfColumns: Int = 0
     
-    //stores the buttons in an array
+    // stores the buttons in an array
     var buttonsArray: [UIButton] = []
     //the random index of the button to be changed
     var randIndex: Int = 0
     
-    //timer variables
+    // timer variables
     var timerRunning = false
     var timerValue: Int = 10
     var timer = Timer()
     var timeTaken: Int = 21
     var afterTimer = Timer()
     
-    //bool to see whether the buttons have been layed out to avoid doing it twice
+    // bool to see whether the buttons have been layed out to avoid doing it twice
     var levelHasLayedOutSubviews = false
     
-    //stores the player score
+    // stores the player score
     var score: Int = 0
     
-    //hint credits
+    // hint credits
     var numberOfHints: Int = UserDefaults.standard.integer(forKey: "hints")
     var numberOfFifty: Int = UserDefaults.standard.integer(forKey: "fifty")
     
-    //the two labels on screen
+    // the two labels on screen
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
     
@@ -59,16 +58,14 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
 
         // Do any additional setup after loading the view.
         
-        //calls new level which prompts a pop up box with the level number
+        // calls new level which prompts a pop up box with the level number
         newLevel()
         
         self.navigationController?.isNavigationBarHidden = true
         
         let highScore = UserDefaults.standard.integer(forKey: "highScore")
         
-        hintsLabel.text = "Hints: \(numberOfHints)"
-        highScoreLabel.text = "\(highScore)"
-        fiftyLabel.text = "50/50s: \(numberOfFifty)"
+        highScoreLabel.text = "High Score: \(highScore)"
         
         let mainQueue = OperationQueue.main
         
@@ -98,10 +95,8 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
     {
         levelHasLayedOutSubviews = false
         
-        FiftyFiftyButton.isUserInteractionEnabled = false
-        
-        //creates pop up box which fades in and out
-        presentMessage(200, height: 50, x: self.view.center.x - 100, y: self.view.center.y - 25, bgColor: UIColor.black, message: "Level \(level)" as NSString, textColor: UIColor.white, fontSize: 30)
+        // creates pop up box which fades in and out
+        presentMessage(200, height: 50, x: self.view.center.x - 100, y: self.view.center.y - 25, bgColor: UIColor.black, message: "Level \(level)", textColor: UIColor.white, fontSize: 30)
         
         timerValue = 10
         timeTaken = 21
@@ -111,7 +106,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         updateScore()
     }
     
-    func presentMessage(_ width: CGFloat, height: CGFloat, x: CGFloat, y: CGFloat, bgColor: UIColor, message: NSString, textColor: UIColor, fontSize: CGFloat)
+    func presentMessage(_ width: CGFloat, height: CGFloat, x: CGFloat, y: CGFloat, bgColor: UIColor, message: String, textColor: UIColor, fontSize: CGFloat)
     {
         let box = UIView(frame: CGRect(x: x, y: y, width: width, height: height))
         
@@ -131,28 +126,27 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         self.view.addSubview(box)
         self.view.addSubview(label)
         
-        UIView.animate(withDuration: 0.8, delay: 0, options: UIViewAnimationOptions.curveLinear, animations: {
+        UIView.animate(withDuration: 1, delay: 0, options: UIViewAnimationOptions.curveLinear, animations: {
             
             box.alpha = 1.0
             label.alpha = 1.0
             
             }, completion: {(finished: Bool) in
             
-            self.fadeOut(0.8, subview: box)
-            self.fadeOut(0.8, subview: label)
+            self.fadeOut(1, subview: box)
+            self.fadeOut(1, subview: label)
             
         })
     }
     
     func fadeOut(_ withDuration: TimeInterval, subview : UIView)
     {
-        
         UIView.animate(withDuration: withDuration, delay: 0, options: UIViewAnimationOptions.curveLinear, animations: {subview.alpha = 0.0}, completion: {finished in if(self.levelHasLayedOutSubviews == false)
         {
             self.layoutButtons()
             self.levelHasLayedOutSubviews = true
             
-            }})
+        }})
     }
     
     func layoutButtons()
@@ -223,7 +217,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         }
         
         setUpTimer()
-
     }
     
     func setUpTimer()
@@ -249,21 +242,17 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             _ = Timer.scheduledTimer(timeInterval: 1.5, target: self, selector: #selector(GameViewController.makeChange), userInfo: nil, repeats: false)
             
             callCurtain()
-
         }
-        
     }
     
     func makeChange()
     {
-        
         randIndex = Int(arc4random_uniform(UInt32(numberOfButtons)))
         
         var newNumber: Int = Int(arc4random_uniform(11))
         
         let theChosenButton: UIButton = buttonsArray[randIndex] as UIButton
         let titleText = theChosenButton.titleLabel?.text
-        
         
         while (String(newNumber) == titleText)
         {
@@ -276,9 +265,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         {
             button.isUserInteractionEnabled = true
         }
-        
-        
-        
     }
     
     func callCurtain()
@@ -297,12 +283,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
                 
                 curtain.removeFromSuperview()
                 self.afterTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(GameViewController.afterTimerCount), userInfo: nil, repeats: true)
-                self.hintButton.isUserInteractionEnabled = true
-                self.FiftyFiftyButton.isUserInteractionEnabled = true
-                
         })
-
-        
     }
     
     func afterTimerCount()
@@ -314,7 +295,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             afterTimer.invalidate()
         }
     }
-    
     
     @IBAction func chooseNumber (_ sender: UIButton!)
     {
@@ -340,7 +320,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             submitScore()
             
             _ = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(GameViewController.quitGame), userInfo: nil, repeats: false)
-            
         }
         
         for button in buttonsArray
@@ -351,9 +330,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         buttonsArray = []
         
         scoreLabel.text = String(score)
-        
-        hintButton.isUserInteractionEnabled = false
-        FiftyFiftyButton.isUserInteractionEnabled = false
         
         afterTimer.invalidate()
     }
@@ -402,27 +378,19 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         if (numberOfFifty > 0)
         {
             giveFiftyFifty()
-            
             numberOfFifty -= 1
-
             fiftyLabel.text = "50/50s: \(numberOfFifty)"
-            
         }
         else
         {
             let alert = UIAlertView(title: "No 50/50 remaining.", message: "You have no more 50/50s. Go to the store to buy more and help you reach the top of the leaderboards!", delegate: self, cancelButtonTitle: "Ok", otherButtonTitles: "Store")
-            
             alert.show()
-            
         }
-        
     }
-    
     
     func giveHint()
     {
         let hintButton = buttonsArray[randIndex]
-            
         hintButton.backgroundColor = UIColor.green
     }
     
@@ -460,10 +428,7 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
             button.isUserInteractionEnabled = false
             
             sequenceArray.remove(at: Int(rand))
-            
-            
         }
-        
     }
     
     func submitScore()
@@ -484,7 +449,6 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         }
         
         let highScore = GKScore(leaderboardIdentifier:id)
-        
         highScore.value = Int64(score)
         
         GKScore.report([highScore], withCompletionHandler: { (error: Error?) -> Void in
@@ -497,31 +461,17 @@ class GameViewController: UIViewController, UIAlertViewDelegate {
         })
         
         UserDefaults.standard.set(score, forKey: "highScore")
-        
-        
     }
     
     func alertView(_ alertView: UIAlertView, clickedButtonAt buttonIndex: Int) {
         
-        let SVC = storyboard?.instantiateViewController(withIdentifier: "SVC") as! StoreViewController
+        let SVC = storyboard?.instantiateViewController(withIdentifier: "SVC") as? StoreViewController
         
-        
-        if (buttonIndex == 1)
+        if let storeVC = SVC, buttonIndex == 1
         {
-            self.navigationController?.present(SVC, animated: true, completion: nil)
-            SVC.isPresentedModally = true
+            self.navigationController?.present(storeVC, animated: true, completion: nil)
+            storeVC.isPresentedModally = true
         }
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue!, sender: AnyObject!) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
